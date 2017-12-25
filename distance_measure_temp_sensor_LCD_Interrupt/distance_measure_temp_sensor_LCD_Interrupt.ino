@@ -1,9 +1,13 @@
 
 /*
 
-  This sketch prints "Hello World!" and distance measure to the LCD HD44780
+  This sketch prints "temperature/humidity" and distance measure to the LCD HD44780
   using the ultrasound sensor HC-SR04.
-  .
+  Leds are switched on according to the distance.
+
+  Author: Ghislain BIDAUT
+  Version 0.91
+  
   The circuit for LCD:
    LCD RS pin to digital pin 12
    LCD Enable pin to digital pin 11
@@ -16,7 +20,7 @@
     ends to +5V and ground
     wiper to LCD VO pin (pin 3)
    Display backend:
-    A to 200 Ohms to +5V
+    A to 220 Ohms to digital pin 1
     K to ground
   VSS To ground
   VDD to +5V
@@ -32,15 +36,14 @@
      Red LED + 470R  -> pin 6
 
   The circuit for DHT11,
-    VCC: 5V or 3V
-    GND: GND
-    DATA: 2
-
-
-  Author: Ghislain BIDAUT
-  Version 0.01
+     VCC: 5V or 3V
+     GND: GND
+     DATA: 13
 
 */
+
+
+
 #include <LiquidCrystal.h>
 #include <SimpleDHT.h>
 #include <Event.h>
@@ -59,9 +62,9 @@
 
 #define maxCount 100      // Idle duration
 
-#define closeDist 20
-#define intermediateDist 100
-#define farDist 300
+#define closeDist 35      // Close distance in cm
+#define intermediateDist 100  //Intermediate distance in cp
+#define farDist 300       // Far distance in cm
 
 
 long counterIdle = 0;
@@ -81,8 +84,10 @@ void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   // Print a message to the LCD.
-  lcd.print("Booting Up");
-
+  lcd.print("Version 0.91");
+  lcd.setCursor(0, 1);
+  lcd.print("Date 25/12/2017");
+  
   // init distance sensor
   pinMode(trigPin, OUTPUT);  //Trig est une sortie
   pinMode(echoPin, INPUT);   //Echo est le retour, en entrée
@@ -99,9 +104,11 @@ void setup() {
   // set up timers for sampling measure
   int tempEvent = t.every(2000, takeTemperatureMesure);
   int distanceEvent = t.every(500, takeDistanceMesure);
+
+  delay(1000);
 }
 
-// Take distance mesaure
+// Take distance measure
 void takeDistanceMesure() {
 
   digitalWrite(trigPin, LOW);
@@ -142,13 +149,13 @@ void takeTemperatureMesure() {
   lcd.print("%)   ");
 }
 
+// infinite loop
 void loop() {
   t.update();
   Serial.print("counterIdle = ");
   Serial.println(counterIdle);
 
-
-  if (abs(previousDistance - distance) <= 1) {
+  if(abs(previousDistance - distance) <= 1 || distance >= farDist) {
     counterIdle++;
   }
   else {
@@ -158,6 +165,11 @@ void loop() {
   previousDistance = distance;
 
   // Display LEDs
+  if ( distance <= 0) {
+    digitalWrite(redLED, HIGH);
+    digitalWrite(orangeLED, HIGH);
+    digitalWrite(greenLED, HIGH);
+  }
   if (distance < closeDist && counterIdle < maxCount) {
     digitalWrite(redLED, HIGH);
     digitalWrite(orangeLED, LOW);
