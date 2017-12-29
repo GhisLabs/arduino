@@ -6,7 +6,7 @@
   Leds are switched on according to the distance.
 
   Author: Ghislain BIDAUT
-  Version 0.91
+  Version 0.92
   
   The circuit for LCD:
    LCD RS pin to digital pin 12
@@ -84,9 +84,9 @@ void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   // Print a message to the LCD.
-  lcd.print("Version 0.91");
+  lcd.print("Version 0.92");
   lcd.setCursor(0, 1);
-  lcd.print("Date 25/12/2017");
+  lcd.print("Date 29/12/2017");
   
   // init distance sensor
   pinMode(trigPin, OUTPUT);  //Trig est une sortie
@@ -105,7 +105,16 @@ void setup() {
   int tempEvent = t.every(2000, takeTemperatureMesure);
   int distanceEvent = t.every(500, takeDistanceMesure);
 
-  delay(1000);
+  // Test LEDS
+  digitalWrite(redLED, HIGH);
+  digitalWrite(orangeLED, HIGH);
+  digitalWrite(greenLED, HIGH);
+  
+  delay(3000);
+
+  digitalWrite(redLED, LOW);
+  digitalWrite(orangeLED, LOW);
+  digitalWrite(greenLED, LOW);
 }
 
 // Take distance measure
