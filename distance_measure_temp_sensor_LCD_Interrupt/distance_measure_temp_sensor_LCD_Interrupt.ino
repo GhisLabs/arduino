@@ -6,7 +6,7 @@
   Leds are switched on according to the distance.
 
   Author: Ghislain BIDAUT
-  Version 0.92
+  Version 0.93
   
   The circuit for LCD:
    LCD RS pin to digital pin 12
@@ -62,7 +62,8 @@
 
 #define maxCount 100      // Idle duration
 
-#define closeDist 35      // Close distance in cm
+#define veryCloseDist 15      // Close distance in cm
+#define closeDist 25      // Close distance in cm
 #define intermediateDist 100  //Intermediate distance in cp
 #define farDist 300       // Far distance in cm
 
@@ -84,9 +85,9 @@ void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   // Print a message to the LCD.
-  lcd.print("Version 0.92");
+  lcd.print("Version 0.93");
   lcd.setCursor(0, 1);
-  lcd.print("Date 29/12/2017");
+  lcd.print("Date 04/11/2018");
   
   // init distance sensor
   pinMode(trigPin, OUTPUT);  //Trig est une sortie
@@ -179,7 +180,14 @@ void loop() {
     digitalWrite(orangeLED, HIGH);
     digitalWrite(greenLED, HIGH);
   }
-  if (distance < closeDist && counterIdle < maxCount) {
+  
+  if (distance < veryCloseDist && counterIdle < maxCount) {
+    digitalWrite(redLED, HIGH);
+    digitalWrite(orangeLED, HIGH);
+    digitalWrite(greenLED, HIGH);
+  }
+
+  if (distance >= veryCloseDist && distance < closeDist && counterIdle < maxCount) {
     digitalWrite(redLED, HIGH);
     digitalWrite(orangeLED, LOW);
     digitalWrite(greenLED, LOW);
@@ -230,4 +238,3 @@ void loop() {
   delay(100);
 
 }
-
